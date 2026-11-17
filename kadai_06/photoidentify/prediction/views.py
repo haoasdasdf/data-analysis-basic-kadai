@@ -12,43 +12,11 @@ from io import BytesIO
 import os
 
 # Create your views here.
-def dc(request):
-    if request.method == 'GET':
-        # GETリクエストによるアクセス時の処理を記述
-        form = ImageUploadForm()
-        return render(request, 'dc.html', {'form': form})
-    if request.method == 'POST':
-        # POSTリクエストによるアクセス時の処理を記述
-        form = ImageUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            img_file = form.cleaned_data['image']
-            # 画像ファイル（img_file）の前処理を追加
-            img_file = BytesIO(img_file.read())
-            img = load_img(img_file, target_size=(256, 256))
-            img_array = img_to_array(img)
-            img_array = preprocess_input(img_array)
-            img_array = img_array.reshape((1, 256, 256, 3))
-            img_array = img_array/255
-            # 判定結果のロジックを追加
-            model_path = os.path.join(settings.BASE_DIR, 'prediction', 'models', 'model.h5')
-            model = load_model(model_path)
-            result = model.predict(img_array)
-            if result[0][0] > result[0][1]:
-                prediction = '猫'
-            else:
-                prediction = '犬'
-
-            img_data = request.POST.get('img_data')
-            return render(request, 'dc.html', {'form': form, 'prediction': prediction, 'img_data': img_data})
-        else:
-            form = ImageUploadForm()
-            return render(request, 'dc.html', {'form': form})
-        
 def things(request):
     if request.method == 'GET':
         # GETリクエストによるアクセス時の処理を記述
         form = ImageUploadForm()
-        return render(request, 'things.html', {'form': form})
+        return render(request, 'home.html', {'form': form})
     if request.method == 'POST':
         # POSTリクエストによるアクセス時の処理を記述
         form = ImageUploadForm(request.POST, request.FILES)
@@ -70,7 +38,7 @@ def things(request):
             print(prediction)
             
             img_data = request.POST.get('img_data')
-            return render(request, 'things.html', {'form': form, 'prediction': prediction, 'img_data': img_data})
+            return render(request, 'home.html', {'form': form, 'prediction': prediction, 'img_data': img_data})
         else:
             form = ImageUploadForm()
-            return render(request, 'things.html', {'form': form})
+            return render(request, 'home.html', {'form': form})
